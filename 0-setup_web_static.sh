@@ -2,22 +2,25 @@
 # This script sets up web servers for the deployment of web_static.
 
 if ! command -v nginx &>/dev/null; then
-    sudo apt-get update
-    sudo apt-get -y install nginx
+    apt-get -y update
+    apt-get -y install nginx
 fi
 
-sudo mkdir -p /data/web_static/releases/test/
-sudo mkdir -p /data/web_static/shared/
-sudo chown -R ubuntu:ubuntu /data/
+mkdir -p /data/web_static/
+mkdir -p /data/web_static/releases/test/
+mkdir -p /data/web_static/shared/
 
-echo "<html><head></head><body>Hello, web_static!</body></html>" | sudo tee /data/web_static/releases/test/index.html
+echo "<html>
+  <head>
+  </head>
+  <body>
+    Holberton School
+  </body></html>" > /data/web_static/releases/test/index.html
 
-sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
+ln -sf /data/web_static/releases/test/ /data/web_static/current
+chown -R ubuntu:ubuntu /data
+sed -i '/listen 80 default_server/a location /hbnb_static/ { alias /data/web_static/current/;}' /etc/nginx/sites-available/default
 
-config_file="/etc/nginx/sites-available/default"
-config_block="location /hbnb_static/ {\n\talias /data/web_static/current/;\n}"
-sudo sed -i "/location \/ {/a $config_block" $config_file
-
-sudo service nginx restart
+service nginx restart
 
 exit 0
